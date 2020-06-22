@@ -27,27 +27,33 @@ async def clear(ctx, amount=1):
     await ctx.channel.purge(limit=amount)
 
 @client.command()
-async def permss(ctx, courses=None):
-    id = ctx.author.id
-    print(str(ctx.author.mention))
-    print(id)
-    for channel in ctx.guild.text_channels:
-        perms = channel.overwrites_for(member)
-        perms.send_messages = False
-        print(str(channel))
-        await channel.set_permissions(id, overwrite=perms, reason="Muted!")
-    await ctx.send(f"{id} has been muted.")
+async def enroll(ctx, courses=''):
+    author = ctx.message.author
+    classes = courses.split(',')
+    categories = ctx.guild.categories
+    classes_index=None
+    for channel in categories:
+        if str(channel).lower()=='classes':
+            classes_index = categories.index(channel)
+    for channel in categories[classes_index].text_channels:
+        for course in classes:
+            if course == str(channel):
+                perms = channel.overwrites_for(author)
+                perms.send_messages = True
+                perms.read_messages = True
+                await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
 
-@client.command()
-async def perms(ctx, member: discord.Member):
-    for channel in ctx.guild.text_channels:
-        if channel=='general':
-        perms = channel.overwrites_for(member)
-        perms.send_messages = False
-        perms.read_messages = False
-        await channel.set_permissions(member, overwrite=perms, reason="Muted!")
-    await ctx.send(f"{member} has been muted.")
+    for channel in categories:
+        if str(channel).lower() == 'classes_voice':
+            classes_index = categories.index(channel)
+    for channel in categories[classes_index].voice_channels:
+        for course in classes:
+            if course == str(channel):
+                # print(course)
+                perms = channel.overwrites_for(author)
+                perms.view_channel = True
 
+                await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
 
 
 
