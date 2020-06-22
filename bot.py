@@ -54,8 +54,75 @@ async def enroll(ctx, courses=''):
                 perms.view_channel = True
 
                 await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
+    courses_string = ''
+    for c in classes:
+        courses_string+=', '+c
+    await ctx.send(f'```'
+                   f'enrolled in{courses_string[1:]}'
+                   f'```')
 
+@client.command()
+async def drop(ctx, courses=''):
+    author = ctx.message.author
+    classes = courses.split(',')
+    categories = ctx.guild.categories
+    classes_index=None
+    for channel in categories:
+        if str(channel).lower()=='classes':
+            classes_index = categories.index(channel)
+    for channel in categories[classes_index].text_channels:
+        for course in classes:
+            if course == str(channel):
+                perms = channel.overwrites_for(author)
+                perms.send_messages = False
+                perms.read_messages = False
+                await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
 
+    for channel in categories:
+        if str(channel).lower() == 'classes_voice':
+            classes_index = categories.index(channel)
+    for channel in categories[classes_index].voice_channels:
+        for course in classes:
+            if course == str(channel):
+                # print(course)
+                perms = channel.overwrites_for(author)
+                perms.view_channel = False
+
+                await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
+    courses_string = ''
+    for c in classes:
+        courses_string+=', '+c
+    await ctx.send(f'```'
+                   f'dropped in{courses_string[1:]}'
+                   f'```')
+
+@client.command()
+async def courses(ctx):
+    categories = ctx.guild.categories
+    author = ctx.message.author
+    courses =[]
+    for channel in categories:
+        if str(channel).lower()=='classes':
+            classes_index = categories.index(channel)
+    for channel in categories[classes_index].text_channels:
+        perms = channel.overwrites_for(author)
+        if perms.read_messages==True:
+            courses.append(str(channel))
+    courses_string = ''
+    for c in courses:
+        courses_string += ', ' + c
+    await ctx.send(f'```'
+                   f'my courses are{courses_string[1:]}'
+                   f'```')
+
+@client.command()
+async def Help(ctx):
+    await ctx.send('```'
+                   'Commands: \n'
+                   '.enroll class1,class2,class3 for this format \n'
+                   '.courses will list out your current courses \n'
+                   '.drop class1,class2,class3 will drop these class \n'
+                   '```')
 
 token_file = open("token.txt",'r')
 for l in token_file:
