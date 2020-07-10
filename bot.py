@@ -4,7 +4,7 @@ from discord.utils import get
 from discord import Member
 from discord.ext.commands import has_permissions, MissingPermissions
 
-client = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix='!')
 
 
 @client.event
@@ -21,6 +21,21 @@ async def on_member_join(member):
 async def on_member_remove(member):
     print(str(member) + ' bye')
 
+@client.command()
+async def room(ctx, *args):
+    message = '!reserve \"' + ctx.message.author.display_name + '\'s Room\" ' + str(len(args)+1) + ' ' + str(ctx.message.author.id) + ' '
+    for user in args:
+        id = getID(ctx,user)
+        if (id is not None):
+            message += str(id) + ' '
+    await ctx.send(message)
+    print(message)
+
+def getID(ctx, name):
+    memberList = ctx.guild.members
+    for member in memberList:
+        if ( member.nick == name or member.name.startswith(name) or member.mention == name):
+            return member.id
 
 @client.command()
 async def clear(ctx, amount=1):
