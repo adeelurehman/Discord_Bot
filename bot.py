@@ -42,7 +42,7 @@ async def clear(ctx, amount=1):
     if "admin" in [y.name.lower() for y in ctx.author.roles]:
         await ctx.channel.purge(limit=amount)
     else:
-        await ctx.send('u thot')
+        await ctx.send('Sorry, this command is restricted to admin use only')
 
 @client.command()
 async def enroll(ctx, courses=''):
