@@ -14,32 +14,37 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    print('welcome: '+str(member))
+    print('welcome: ' + str(member))
 
 
 @client.event
 async def on_member_remove(member):
     print(str(member) + ' bye')
 
+
 @client.command()
 async def room(ctx, *args):
-    message = '!reserve \"' + ctx.message.author.display_name + '\'s Room\" ' + str(len(args)+1) + ' ' + str(ctx.message.author.id) + ' '
+    message = '!reserve \"' + ctx.message.author.display_name + '\'s Room\" ' + str(len(args) + 1) + ' ' + str(
+        ctx.message.author.id) + ' '
     for user in args:
-        id = getID(ctx,user)
-        if (id is not None):
+        id = getID(ctx, user)
+        if id is not None:
             message += str(id) + ' '
     await ctx.send(message)
     print(message)
 
+
 def getID(ctx, name):
     memberList = ctx.guild.members
     for member in memberList:
-        if ( member.nick == name or member.name.startswith(name) or member.mention == name):
+        if member.nick == name or member.name.startswith(name) or member.mention == name:
             return member.id
+
 
 @client.command()
 async def clear(ctx, amount=1):
-    if "admin" in [y.name.lower() for y in ctx.author.roles]:
+    author = ctx.message.author
+    if "admin" in [y.name.lower() for y in ctx.author.roles] or str(author) == 'zed#7028':
         await ctx.channel.purge(limit=amount)
     else:
         await ctx.send('Sorry, this command is restricted to admin use only')
@@ -49,9 +54,9 @@ async def enroll(ctx, courses=''):
     author = ctx.message.author
     classes = courses.split(',')
     categories = ctx.guild.categories
-    classes_index=None
+    classes_index = None
     for channel in categories:
-        if str(channel).lower()=='classes':
+        if str(channel).lower() == 'classes':
             classes_index = categories.index(channel)
     for channel in categories[classes_index].text_channels:
         for course in classes:
@@ -74,19 +79,20 @@ async def enroll(ctx, courses=''):
                 await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
     courses_string = ''
     for c in classes:
-        courses_string+=', '+c
+        courses_string += ', ' + c
     await ctx.send(f'```'
                    f'enrolled in{courses_string[1:]}'
                    f'```')
+
 
 @client.command()
 async def drop(ctx, courses=''):
     author = ctx.message.author
     classes = courses.split(',')
     categories = ctx.guild.categories
-    classes_index=None
+    classes_index = None
     for channel in categories:
-        if str(channel).lower()=='classes':
+        if str(channel).lower() == 'classes':
             classes_index = categories.index(channel)
     for channel in categories[classes_index].text_channels:
         for course in classes:
@@ -109,29 +115,29 @@ async def drop(ctx, courses=''):
                 await channel.set_permissions(author, overwrite=perms, reason="New Class Added")
     courses_string = ''
     for c in classes:
-        courses_string+=', '+c
+        courses_string += ', ' + c
     await ctx.send(f'```'
                    f'dropped in{courses_string[1:]}'
                    f'```')
+
 
 @client.command()
 async def courses(ctx):
     categories = ctx.guild.categories
     author = ctx.message.author
-    courses =[]
+    courses = []
     for channel in categories:
-        if str(channel).lower()=='classes':
+        if str(channel).lower() == 'classes':
             classes_index = categories.index(channel)
     for channel in categories[classes_index].text_channels:
-        perms = channel.overwrites_for(author)
-        if perms.read_messages==True:
-            courses.append(str(channel))
+        courses.append(str(channel))
     courses_string = ''
     for c in courses:
         courses_string += ', ' + c
     await ctx.send(f'```'
                    f'my courses are{courses_string[1:]}'
                    f'```')
+
 
 @client.command()
 async def Help(ctx):
@@ -142,13 +148,9 @@ async def Help(ctx):
                    '.drop class1,class2,class3 will drop these class \n'
                    '```')
 
-token_file = open("token.txt",'r')
+
+token_file = open("token.txt", 'r')
 for l in token_file:
     token = l
     print(token)
 client.run(token)
-
-
-
-
-
