@@ -39,7 +39,10 @@ def getID(ctx, name):
 
 @client.command()
 async def clear(ctx, amount=1):
-    await ctx.channel.purge(limit=amount)
+    if "admin" in [y.name.lower() for y in ctx.author.roles]:
+        await ctx.channel.purge(limit=amount)
+    else:
+        await ctx.send('u thot')
 
 @client.command()
 async def enroll(ctx, courses=''):
