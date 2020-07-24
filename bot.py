@@ -1,4 +1,5 @@
 import discord
+import time
 from discord.ext import commands
 from discord.utils import get
 from discord import Member
@@ -41,11 +42,30 @@ def getID(ctx, name):
             return member.id
 
 
+oneAdmin = False
+time_of_first_call = 0
+amount_of_first_call = 0
+id_of_first_call = 0
 @client.command()
 async def clear(ctx, amount=1):
     author = ctx.message.author
-    if "admin" in [y.name.lower() for y in ctx.author.roles] or str(author) == 'zed#7028':
-        await ctx.channel.purge(limit=amount)
+    # Import Global Variables
+    global oneAdmin
+    global time_of_first_call
+    global amount_of_first_call
+    global id_of_first_call
+    # If called by second admin
+    if ("admin" in [y.name.lower() for y in ctx.author.roles] or str(author) == 'zed#7028') and oneAdmin and time.time() - time_of_first_call <60 and amount == amount_of_first_call and id_of_first_call != ctx.message.author:
+        oneAdmin = False
+        await ctx.channel.purge(limit=amount+2)
+    # If called by first admin
+    elif ("admin" in [y.name.lower() for y in ctx.author.roles] or str(author) == 'zed#7028') and not oneAdmin:
+        oneAdmin = True
+        time_of_first_call = time.time()
+        amount_of_first_call = amount
+        id_of_first_call = ctx.message.author
+        await ctx.send("This command requires two admins to execute. Please have a second admin send the same command to execute")
+    # If called by non-admin
     else:
         await ctx.send('Sorry, this command is restricted to admin use only')
 
